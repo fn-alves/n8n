@@ -1,20 +1,14 @@
 import { GlobalConfig } from '@n8n/config';
-import type { TEntitlement, TFeatures, TLicenseBlock } from '@n8n_io/license-sdk';
-import { LicenseManager } from '@n8n_io/license-sdk';
-import { InstanceSettings, ObjectStoreService } from 'n8n-core';
-import Container, { Service } from 'typedi';
+import type { LicenseManager } from '@n8n_io/license-sdk';
+import { Service } from 'typedi';
 
-import config from '@/config';
 import { SettingsRepository } from '@/databases/repositories/settings.repository';
 import { OnShutdown } from '@/decorators/on-shutdown';
 import { Logger } from '@/logging/logger.service';
-import { LicenseMetricsService } from '@/metrics/license-metrics.service';
-import { OrchestrationService } from '@/services/orchestration.service';
 
 import {
 	LICENSE_FEATURES,
 	LICENSE_QUOTAS,
-	N8N_VERSION,
 	SETTINGS_LICENSE_CERT_KEY,
 	UNLIMITED_LICENSE_QUOTA,
 } from './constants';
@@ -34,10 +28,10 @@ export class License {
 
 	constructor(
 		private readonly logger: Logger,
-		private readonly instanceSettings: InstanceSettings,
-		private readonly orchestrationService: OrchestrationService,
+		// private readonly instanceSettings: InstanceSettings,
+		// private readonly orchestrationService: OrchestrationService,
 		private readonly settingsRepository: SettingsRepository,
-		private readonly licenseMetricsService: LicenseMetricsService,
+		// private readonly licenseMetricsService: LicenseMetricsService,
 		private readonly globalConfig: GlobalConfig,
 	) {
 		this.logger = this.logger.scoped('license');
@@ -46,71 +40,71 @@ export class License {
 	/**
 	 * Whether this instance should renew the license - on init and periodically.
 	 */
-	private renewalEnabled() {
-		if (this.instanceSettings.instanceType !== 'main') return false;
-		const autoRenewEnabled = this.globalConfig.license.autoRenewalEnabled;
+	// private renewalEnabled() {
+	// 	if (this.instanceSettings.instanceType !== 'main') return false;
+	// 	const autoRenewEnabled = this.globalConfig.license.autoRenewalEnabled;
+	//
+	// 	/**
+	// 	 * In multi-main setup, all mains start off with `unset` status and so renewal disabled.
+	// 	 * On becoming leader or follower, each will enable or disable renewal, respectively.
+	// 	 * This ensures the mains do not cause a 429 (too many requests) on license init.
+	// 	 */
+	// 	if (this.globalConfig.multiMainSetup.enabled) {
+	// 		return autoRenewEnabled && this.instanceSettings.isLeader;
+	// 	}
+	//
+	// 	return autoRenewEnabled;
+	// }
 
-		/**
-		 * In multi-main setup, all mains start off with `unset` status and so renewal disabled.
-		 * On becoming leader or follower, each will enable or disable renewal, respectively.
-		 * This ensures the mains do not cause a 429 (too many requests) on license init.
-		 */
-		if (this.globalConfig.multiMainSetup.enabled) {
-			return autoRenewEnabled && this.instanceSettings.isLeader;
-		}
-
-		return autoRenewEnabled;
-	}
-
-	async init(forceRecreate = false) {
-		if (this.manager && !forceRecreate) {
-			this.logger.warn('License manager already initialized or shutting down');
-			return;
-		}
+	async init(_forceRecreate = false) {
+		// if (this.manager && !forceRecreate) {
+		// 	this.logger.warn('License manager already initialized or shutting down');
+		// 	return;
+		// }
 		if (this.isShuttingDown) {
 			this.logger.warn('License manager already shutting down');
 			return;
 		}
 
-		const { instanceType } = this.instanceSettings;
-		const isMainInstance = instanceType === 'main';
-		const server = this.globalConfig.license.serverUrl;
-		const offlineMode = !isMainInstance;
-		const autoRenewOffset = this.globalConfig.license.autoRenewOffset;
-		const saveCertStr = isMainInstance
-			? async (value: TLicenseBlock) => await this.saveCertStr(value)
-			: async () => {};
-		const onFeatureChange = isMainInstance
-			? async (features: TFeatures) => await this.onFeatureChange(features)
-			: async () => {};
-		const collectUsageMetrics = isMainInstance
-			? async () => await this.licenseMetricsService.collectUsageMetrics()
-			: async () => [];
-		const collectPassthroughData = isMainInstance
-			? async () => await this.licenseMetricsService.collectPassthroughData()
-			: async () => ({});
-
-		const renewalEnabled = this.renewalEnabled();
+		// const { instanceType } = this.instanceSettings;
+		// const isMainInstance = instanceType === 'main';
+		// const server = this.globalConfig.license.serverUrl;
+		// const offlineMode = !isMainInstance;
+		// const autoRenewOffset = this.globalConfig.license.autoRenewOffset;
+		// const saveCertStr = isMainInstance
+		// 	? async (value: TLicenseBlock) => await this.saveCertStr(value)
+		// 	: async () => {};
+		// const onFeatureChange = isMainInstance
+		// 	? async (features: TFeatures) => await this.onFeatureChange(features)
+		// 	: async () => {};
+		// const collectUsageMetrics = isMainInstance
+		// 	? async () => await this.licenseMetricsService.collectUsageMetrics()
+		// 	: async () => [];
+		// const collectPassthroughData = isMainInstance
+		// 	? async () => await this.licenseMetricsService.collectPassthroughData()
+		// 	: async () => ({});
+		//
+		// const renewalEnabled = this.renewalEnabled();
 
 		try {
-			this.manager = new LicenseManager({
-				server,
-				tenantId: this.globalConfig.license.tenantId,
-				productIdentifier: `n8n-${N8N_VERSION}`,
-				autoRenewEnabled: renewalEnabled,
-				renewOnInit: renewalEnabled,
-				autoRenewOffset,
-				offlineMode,
-				logger: this.logger,
-				loadCertStr: async () => await this.loadCertStr(),
-				saveCertStr,
-				deviceFingerprint: () => this.instanceSettings.instanceId,
-				collectUsageMetrics,
-				collectPassthroughData,
-				onFeatureChange,
-			});
+			// this.manager = new LicenseManager({
+			// 	server,
+			// 	tenantId: this.globalConfig.license.tenantId,
+			// 	productIdentifier: `n8n-${N8N_VERSION}`,
+			// 	autoRenewEnabled: renewalEnabled,
+			// 	renewOnInit: renewalEnabled,
+			// 	autoRenewOffset,
+			// 	offlineMode,
+			// 	logger: this.logger,
+			// 	loadCertStr: async () => await this.loadCertStr(),
+			// 	saveCertStr,
+			// 	deviceFingerprint: () => this.instanceSettings.instanceId,
+			// 	collectUsageMetrics,
+			// 	collectPassthroughData,
+			// 	onFeatureChange,
+			// });
 
-			await this.manager.initialize();
+			// await this.manager.initialize();
 			this.logger.debug('License initialized');
 		} catch (error: unknown) {
 			if (error instanceof Error) {
@@ -134,60 +128,60 @@ export class License {
 		return databaseSettings?.value ?? '';
 	}
 
-	async onFeatureChange(_features: TFeatures): Promise<void> {
-		this.logger.debug('License feature change detected', _features);
-
-		if (config.getEnv('executions.mode') === 'queue' && this.globalConfig.multiMainSetup.enabled) {
-			const isMultiMainLicensed = _features[LICENSE_FEATURES.MULTIPLE_MAIN_INSTANCES] as
-				| boolean
-				| undefined;
-
-			this.orchestrationService.setMultiMainSetupLicensed(isMultiMainLicensed ?? false);
-
-			if (this.orchestrationService.isMultiMainSetupEnabled && this.instanceSettings.isFollower) {
-				this.logger.debug(
-					'[Multi-main setup] Instance is follower, skipping sending of "reload-license" command...',
-				);
-				return;
-			}
-
-			if (this.orchestrationService.isMultiMainSetupEnabled && !isMultiMainLicensed) {
-				this.logger.debug(
-					'[Multi-main setup] License changed with no support for multi-main setup - no new followers will be allowed to init. To restore multi-main setup, please upgrade to a license that supports this feature.',
-				);
-			}
-		}
-
-		if (config.getEnv('executions.mode') === 'queue') {
-			const { Publisher } = await import('@/scaling/pubsub/publisher.service');
-			await Container.get(Publisher).publishCommand({ command: 'reload-license' });
-		}
-
-		const isS3Selected = config.getEnv('binaryDataManager.mode') === 's3';
-		const isS3Available = config.getEnv('binaryDataManager.availableModes').includes('s3');
-		const isS3Licensed = _features['feat:binaryDataS3'];
-
-		if (isS3Selected && isS3Available && !isS3Licensed) {
-			this.logger.debug(
-				'License changed with no support for external storage - blocking writes on object store. To restore writes, please upgrade to a license that supports this feature.',
-			);
-
-			Container.get(ObjectStoreService).setReadonly(true);
-		}
-	}
-
-	async saveCertStr(value: TLicenseBlock): Promise<void> {
-		// if we have an ephemeral license, we don't want to save it to the database
-		if (this.globalConfig.license.cert) return;
-		await this.settingsRepository.upsert(
-			{
-				key: SETTINGS_LICENSE_CERT_KEY,
-				value,
-				loadOnStartup: false,
-			},
-			['key'],
-		);
-	}
+	// async onFeatureChange(_features: TFeatures): Promise<void> {
+	// 	this.logger.debug('License feature change detected', _features);
+	//
+	// 	if (config.getEnv('executions.mode') === 'queue' && this.globalConfig.multiMainSetup.enabled) {
+	// 		const isMultiMainLicensed = _features[LICENSE_FEATURES.MULTIPLE_MAIN_INSTANCES] as
+	// 			| boolean
+	// 			| undefined;
+	//
+	// 		this.orchestrationService.setMultiMainSetupLicensed(isMultiMainLicensed ?? false);
+	//
+	// 		if (this.orchestrationService.isMultiMainSetupEnabled && this.instanceSettings.isFollower) {
+	// 			this.logger.debug(
+	// 				'[Multi-main setup] Instance is follower, skipping sending of "reload-license" command...',
+	// 			);
+	// 			return;
+	// 		}
+	//
+	// 		if (this.orchestrationService.isMultiMainSetupEnabled && !isMultiMainLicensed) {
+	// 			this.logger.debug(
+	// 				'[Multi-main setup] License changed with no support for multi-main setup - no new followers will be allowed to init. To restore multi-main setup, please upgrade to a license that supports this feature.',
+	// 			);
+	// 		}
+	// 	}
+	//
+	// 	if (config.getEnv('executions.mode') === 'queue') {
+	// 		const { Publisher } = await import('@/scaling/pubsub/publisher.service');
+	// 		await Container.get(Publisher).publishCommand({ command: 'reload-license' });
+	// 	}
+	//
+	// 	const isS3Selected = config.getEnv('binaryDataManager.mode') === 's3';
+	// 	const isS3Available = config.getEnv('binaryDataManager.availableModes').includes('s3');
+	// 	const isS3Licensed = _features['feat:binaryDataS3'];
+	//
+	// 	if (isS3Selected && isS3Available && !isS3Licensed) {
+	// 		this.logger.debug(
+	// 			'License changed with no support for external storage - blocking writes on object store. To restore writes, please upgrade to a license that supports this feature.',
+	// 		);
+	//
+	// 		Container.get(ObjectStoreService).setReadonly(true);
+	// 	}
+	// }
+	//
+	// async saveCertStr(value: TLicenseBlock): Promise<void> {
+	// 	// if we have an ephemeral license, we don't want to save it to the database
+	// 	if (this.globalConfig.license.cert) return;
+	// 	await this.settingsRepository.upsert(
+	// 		{
+	// 			key: SETTINGS_LICENSE_CERT_KEY,
+	// 			value,
+	// 			loadOnStartup: false,
+	// 		},
+	// 		['key'],
+	// 	);
+	// }
 
 	async activate(activationKey: string): Promise<void> {
 		if (!this.manager) {
@@ -230,7 +224,8 @@ export class License {
 	}
 
 	isFeatureEnabled(feature: BooleanLicenseFeature) {
-		return this.manager?.hasFeatureEnabled(feature) ?? false;
+		const disabledFeatures = [LICENSE_FEATURES.SHOW_NON_PROD_BANNER];
+		return !disabledFeatures.includes(feature);
 	}
 
 	isSharingEnabled() {
@@ -378,7 +373,8 @@ export class License {
 	}
 
 	getPlanName(): string {
-		return this.getFeatureValue('planName') ?? 'Community';
+		return this.getFeatureValue('planName') ?? 'Enterprise';
+		// return this.getFeatureValue('planName') ?? 'Community';
 	}
 
 	getInfo(): string {

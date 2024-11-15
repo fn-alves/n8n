@@ -21,12 +21,12 @@ for (let { name, path, version, private: isPrivate } of packages) {
 		license: 'SEE LICENSE IN LICENSE.md',
 		homepage: 'https://n8n.io',
 		author: {
-			name: 'Jan Oberhauser',
-			email: 'jan@n8n.io',
+			name: 'Fernando Alves',
+			email: 'fa@n8n.io',
 		},
 		repository: {
 			type: 'git',
-			url: 'git+https://github.com/n8n-io/n8n.git',
+			url: 'git+https://github.com/fn-alves/n8n.git',
 		},
 	};
 

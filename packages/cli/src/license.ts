@@ -1,5 +1,6 @@
 import { GlobalConfig } from '@n8n/config';
-import type { LicenseManager } from '@n8n_io/license-sdk';
+import type { LicenseManager, TEntitlement, TLicenseBlock } from '@n8n_io/license-sdk';
+import { nanoid } from 'nanoid';
 import { Service } from 'typedi';
 
 import { SettingsRepository } from '@/databases/repositories/settings.repository';
@@ -105,7 +106,7 @@ export class License {
 			// });
 
 			// await this.manager.initialize();
-			this.logger.debug('License initialized');
+			this.logger.info('License initialized');
 		} catch (error: unknown) {
 			if (error instanceof Error) {
 				this.logger.error('Could not initialize license manager sdk', { error });
@@ -204,8 +205,7 @@ export class License {
 		if (!this.manager) {
 			return;
 		}
-
-		await this.manager.renew();
+		// await this.manager.renew();
 		this.logger.debug('License renewed');
 	}
 
@@ -224,7 +224,7 @@ export class License {
 	}
 
 	isFeatureEnabled(feature: BooleanLicenseFeature) {
-		const disabledFeatures = [LICENSE_FEATURES.SHOW_NON_PROD_BANNER];
+		const disabledFeatures: BooleanLicenseFeature[] = [LICENSE_FEATURES.SHOW_NON_PROD_BANNER];
 		return !disabledFeatures.includes(feature);
 	}
 
@@ -332,7 +332,7 @@ export class License {
 	 */
 	getMainPlan(): TEntitlement | undefined {
 		if (!this.manager) {
-			return undefined;
+			return { productId: nanoid() } as TEntitlement;
 		}
 
 		const entitlements = this.getCurrentEntitlements();

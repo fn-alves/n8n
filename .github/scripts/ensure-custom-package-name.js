@@ -7,7 +7,7 @@ const ensure = (packageName) => {
 	const { name, ...packageJson } = require(
 		filePath,
 	);
-	packageJson.name = `fx${packageName}`;
+	packageJson.name = `fxn8n`;
 	writeFileSync(filePath, JSON.stringify(packageJson, null, 2) + '\n', 'utf-8');
 };
 

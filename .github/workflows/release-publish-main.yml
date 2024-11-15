@@ -53,7 +53,7 @@ jobs:
           node .github/scripts/trim-fe-packageJson.js
           node .github/scripts/ensure-provenance-fields.mjs
           sed -i "s/default: 'dev'/default: 'stable'/g" packages/cli/dist/config/schema.js
-          pnpm publish -r --access public --tag rc --no-git-checks
+          pnpm publish -r --filter "fxn8n" --access public --tag rc --no-git-checks
           npm dist-tag rm n8n rc
 
       - id: set-release

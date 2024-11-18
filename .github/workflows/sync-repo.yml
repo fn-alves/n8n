@@ -37,7 +37,7 @@ jobs:
       - name: Show value of 'has_new_commits'
         run: echo ${{ steps.sync.outputs.has_new_commits }}
 
-  trigger-next-workflow:
+  trigger-release:
     needs: sync-upstream
     if: needs.sync-upstream.outputs.has_new_commits == 'true'
     uses: ./.github/workflows/release-publish-main.yml

@@ -6,15 +6,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  sync:
+  sync-upstream:
     runs-on: ubuntu-latest
     name: Sync HEAD with Upstream
     steps:
       - name: Checkout HEAD
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.1.1
         with:
-          ref: main
-          persist-credentials: false
+          fetch-depth: 0
 
       - name: Sync com Upstream
         id: sync
@@ -24,6 +23,9 @@ jobs:
           upstream_sync_branch: "master"
           target_sync_branch: "main"
           target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: set-output
+        run: echo "has_new_commits=${{ steps.sync.outputs.has_new_commits }}" >> $GITHUB_OUTPUT
 
       - name: New commits found
         if: steps.sync.outputs.has_new_commits == 'true'
@@ -37,6 +39,6 @@ jobs:
         run: echo ${{ steps.sync.outputs.has_new_commits }}
 
   trigger-next-workflow:
-    needs: sync
-    if: needs.sync.steps.sync.outputs.has_new_commits == 'true'
+    needs: sync-upstream
+    if: needs.sync-upstream.outputs.has_new_commits == 'true'
     uses: ./.github/workflows/release-publish-main.yml

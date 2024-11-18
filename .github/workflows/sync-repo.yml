@@ -9,6 +9,8 @@ jobs:
   sync-upstream:
     runs-on: ubuntu-latest
     name: Sync HEAD with Upstream
+    outputs:
+      has_new_commits: ${{ steps.sync.outputs.has_new_commits }}
     steps:
       - name: Checkout HEAD
         uses: actions/checkout@v4.1.1
@@ -23,9 +25,6 @@ jobs:
           upstream_sync_branch: "master"
           target_sync_branch: "main"
           target_repo_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - id: set-output
-        run: echo "has_new_commits=${{ steps.sync.outputs.has_new_commits }}" >> $GITHUB_OUTPUT
 
       - name: New commits found
         if: steps.sync.outputs.has_new_commits == 'true'

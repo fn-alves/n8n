@@ -39,5 +39,5 @@ jobs:
 
   trigger-release:
     needs: sync-upstream
-#    if: needs.sync-upstream.outputs.has_new_commits == 'true'
+    if: needs.sync-upstream.outputs.has_new_commits == 'true'
     uses: ./.github/workflows/release-publish-main.yml

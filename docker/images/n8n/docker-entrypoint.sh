@@ -8,8 +8,8 @@ fi
 
 if [ "$#" -gt 0 ]; then
   # Got started with arguments
-  exec fxn8n "$@"
+  exec n8n "$@"
 else
   # Got started without arguments
-  exec fxn8n
+  exec n8n
 fi

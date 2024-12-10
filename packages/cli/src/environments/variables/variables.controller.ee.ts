@@ -17,7 +17,7 @@ export class VariablesController {
 	@Get('/')
 	@GlobalScope('variable:list')
 	async getVariables(_req: unknown, _res: unknown, @Query query: VariableListRequestDto) {
-		return await this.variablesService.getAllCached(query.state);
+		return await this.variablesService.getAllCached(query?.state);
 	}
 
 	@Post('/')

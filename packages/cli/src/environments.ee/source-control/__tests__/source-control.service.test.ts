@@ -1,6 +1,6 @@
+import { Container } from '@n8n/di';
 import { mock } from 'jest-mock-extended';
 import { InstanceSettings } from 'n8n-core';
-import { Container } from 'typedi';
 
 import { SourceControlPreferencesService } from '@/environments.ee/source-control/source-control-preferences.service.ee';
 import { SourceControlService } from '@/environments.ee/source-control/source-control.service.ee';
@@ -8,6 +8,8 @@ import { SourceControlService } from '@/environments.ee/source-control/source-co
 describe('SourceControlService', () => {
 	const preferencesService = new SourceControlPreferencesService(
 		Container.get(InstanceSettings),
+		mock(),
+		mock(),
 		mock(),
 		mock(),
 	);

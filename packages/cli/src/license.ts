@@ -104,7 +104,7 @@ export class License {
 			// });
 
 			// await this.manager.initialize();
-			this.logger.info('License initialized');
+			this.logger.debug('License initialized');
 		} catch (error: unknown) {
 			if (error instanceof Error) {
 				this.logger.error('Could not initialize license manager sdk', { error });
@@ -271,7 +271,7 @@ export class License {
 		return this.isFeatureEnabled(LICENSE_FEATURES.BINARY_DATA_S3);
 	}
 
-	isMultipleMainInstancesLicensed() {
+	isMultiMainLicensed() {
 		return this.isFeatureEnabled(LICENSE_FEATURES.MULTIPLE_MAIN_INSTANCES);
 	}
 

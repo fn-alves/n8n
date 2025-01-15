@@ -2,6 +2,7 @@ import { GlobalConfig } from '@n8n/config';
 import { Service } from '@n8n/di';
 import type { TEntitlement, TLicenseBlock, LicenseManager } from '@n8n_io/license-sdk';
 import { Logger } from 'n8n-core';
+import { nanoid } from 'nanoid';
 
 import { SettingsRepository } from '@/databases/repositories/settings.repository';
 import { OnShutdown } from '@/decorators/on-shutdown';

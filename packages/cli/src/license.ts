@@ -1,11 +1,10 @@
 import { GlobalConfig } from '@n8n/config';
-import type { LicenseManager, TEntitlement, TLicenseBlock } from '@n8n_io/license-sdk';
-import { nanoid } from 'nanoid';
-import { Service } from 'typedi';
+import { Service } from '@n8n/di';
+import type { TEntitlement, TLicenseBlock, LicenseManager } from '@n8n_io/license-sdk';
+import { Logger } from 'n8n-core';
 
 import { SettingsRepository } from '@/databases/repositories/settings.repository';
 import { OnShutdown } from '@/decorators/on-shutdown';
-import { Logger } from '@/logging/logger.service';
 
 import {
 	LICENSE_FEATURES,
@@ -367,7 +366,7 @@ export class License {
 	}
 
 	getAiCredits() {
-		return this.getFeatureValue(LICENSE_QUOTAS.AI_CREDITS) ?? 0;
+		return this.getFeatureValue(LICENSE_QUOTAS.AI_CREDITS) ?? UNLIMITED_LICENSE_QUOTA;
 	}
 
 	getWorkflowHistoryPruneLimit() {
@@ -377,7 +376,7 @@ export class License {
 	}
 
 	getTeamProjectLimit() {
-		return this.getFeatureValue(LICENSE_QUOTAS.TEAM_PROJECT_LIMIT) ?? 0;
+		return this.getFeatureValue(LICENSE_QUOTAS.TEAM_PROJECT_LIMIT) ?? UNLIMITED_LICENSE_QUOTA;
 	}
 
 	getPlanName(): string {
